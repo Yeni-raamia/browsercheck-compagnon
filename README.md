@@ -5,6 +5,8 @@
 
 `browsercheck-compagnon` analyse la configuration de sécurité des navigateurs installés sur un poste Windows et produit un rapport clair, visuel et actionnable — lisible aussi bien par un utilisateur que par un responsable de la sécurité.
 
+![Aperçu du rapport browsercheck-compagnon](apercu-rapport.png)
+
 ## À propos
 
 Cet outil fait partie des **Outils Compagnon**, une famille d'outils de cybersécurité pensés pour être simples, lisibles et utiles au quotidien.

@@ -3,81 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <title>browsercheck-compagnon</title>
+    <link rel="stylesheet" href="rapport.css">
 </head>
 <body>
-    <h1>browsercheck-compagnon</h1>
-    <h2>Google Chrome - 79 %</h2>
-    <div class='carte'>
-      <h3>Navigation securisee (Safe Browsing)</h3>
-      <p class='etat'>Bon</p>
-      <p>Protection standard active.</p>
-    </div>
-    <div class='carte'>
-      <h3>Gestionnaire de mots de passe du navigateur</h3>
-      <p class='etat'>A ameliorer</p>
-      <p>Le navigateur peut enregistrer les mots de passe ; un gestionnaire dedie est plus sur.</p>
-    </div>
-    <div class='carte'>
-      <h3>Connexions securisees (mode HTTPS)</h3>
-      <p class='etat'>A ameliorer</p>
-      <p>Le mode HTTPS strict n'est pas active.</p>
-    </div>
-    <div class='carte'>
-      <h3>Moteur de recherche par defaut</h3>
-      <p class='etat'>Bon</p>
-      <p>Moteur de recherche d'origine, non modifie.</p>
-    </div>
-    <div class='carte'>
-      <h3>Extensions installees</h3>
-      <p class='etat'>Bon</p>
-      <p>Aucune extension installee : surface d'attaque nulle.</p>
-    </div>
-    <div class='carte'>
-      <h3>Permissions sensibles accordees aux sites</h3>
-      <p class='etat'>A ameliorer</p>
-      <p>2 autorisation(s) sensible(s) accordee(s) - a passer en revue.</p>
-    </div>
-    <div class='carte'>
-      <h3>Mise a jour du navigateur</h3>
-      <p class='etat'>Bon</p>
-      <p>Version 148.0.7778.179, mise a jour il y a 7 jour(s).</p>
-    </div>
-    <h2>Microsoft Edge - 86 %</h2>
-    <div class='carte'>
-      <h3>Navigation securisee (Safe Browsing)</h3>
-      <p class='etat'>Bon</p>
-      <p>Protection standard active.</p>
-    </div>
-    <div class='carte'>
-      <h3>Gestionnaire de mots de passe du navigateur</h3>
-      <p class='etat'>A ameliorer</p>
-      <p>Le navigateur peut enregistrer les mots de passe ; un gestionnaire dedie est plus sur.</p>
-    </div>
-    <div class='carte'>
-      <h3>Connexions securisees (mode HTTPS)</h3>
-      <p class='etat'>A ameliorer</p>
-      <p>Le mode HTTPS strict n'est pas active.</p>
-    </div>
-    <div class='carte'>
-      <h3>Moteur de recherche par defaut</h3>
-      <p class='etat'>Bon</p>
-      <p>Moteur de recherche d'origine, non modifie.</p>
-    </div>
-    <div class='carte'>
-      <h3>Extensions installees</h3>
-      <p class='etat'>Bon</p>
-      <p>Aucune extension installee : surface d'attaque nulle.</p>
-    </div>
-    <div class='carte'>
-      <h3>Permissions sensibles accordees aux sites</h3>
-      <p class='etat'>Bon</p>
-      <p>Aucun site n'a acces a la camera, au micro ou a la localisation.</p>
-    </div>
-    <div class='carte'>
-      <h3>Mise a jour du navigateur</h3>
-      <p class='etat'>Bon</p>
-      <p>Version 148.0.3967.83, mise a jour il y a 5 jour(s).</p>
-    </div>
+    <div class="page">
+        <header>
+            <div class="mascotte" role="img" aria-label="Mascotte browsercheck-compagnon"></div>
+            <div class="header-texte">
+                <h1>browsercheck-compagnon</h1>
+                <p>Diagnostic de sécurité de vos navigateurs</p>
+            </div>
+        </header>
+        <div class='grille'>
+          <section class='panneau'>
+            <h2>Google Chrome</h2>
+            <div class='score-ligne'>
+              <div class='jauge'><div class='jauge-remplissage score-moyen' style='width: 79%'></div></div>
+              <span class='score-valeur score-moyen-texte'>79 %</span>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Navigation sécurisée (Safe Browsing)</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Protection standard active.</div>
+            </div>
+            <div class='controle etat-ameliorer'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Gestionnaire de mots de passe du navigateur</span>
+                <span class='etat'>À améliorer</span>
+              </div>
+              <div class='controle-detail'>Le navigateur peut enregistrer les mots de passe ; un gestionnaire dédié est plus sûr.</div>
+            </div>
+            <div class='controle etat-ameliorer'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Connexions sécurisées (mode HTTPS)</span>
+                <span class='etat'>À améliorer</span>
+              </div>
+              <div class='controle-detail'>Le mode HTTPS strict n'est pas activé.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Moteur de recherche par défaut</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Moteur de recherche d'origine, non modifié.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Extensions installées</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Aucune extension installée : surface d'attaque nulle.</div>
+            </div>
+            <div class='controle etat-ameliorer'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Permissions sensibles accordées aux sites</span>
+                <span class='etat'>À améliorer</span>
+              </div>
+              <div class='controle-detail'>2 autorisation(s) sensible(s) accordée(s) - à passer en revue.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Mise à jour du navigateur</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Version 148.0.7778.179, mise à jour il y a 7 jour(s).</div>
+            </div>
+          </section>
+          <section class='panneau'>
+            <h2>Microsoft Edge</h2>
+            <div class='score-ligne'>
+              <div class='jauge'><div class='jauge-remplissage score-bon' style='width: 86%'></div></div>
+              <span class='score-valeur score-bon-texte'>86 %</span>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Navigation sécurisée (Safe Browsing)</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Protection standard active.</div>
+            </div>
+            <div class='controle etat-ameliorer'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Gestionnaire de mots de passe du navigateur</span>
+                <span class='etat'>À améliorer</span>
+              </div>
+              <div class='controle-detail'>Le navigateur peut enregistrer les mots de passe ; un gestionnaire dédié est plus sûr.</div>
+            </div>
+            <div class='controle etat-ameliorer'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Connexions sécurisées (mode HTTPS)</span>
+                <span class='etat'>À améliorer</span>
+              </div>
+              <div class='controle-detail'>Le mode HTTPS strict n'est pas activé.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Moteur de recherche par défaut</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Moteur de recherche d'origine, non modifié.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Extensions installées</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Aucune extension installée : surface d'attaque nulle.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Permissions sensibles accordées aux sites</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Aucun site n'a accès à la caméra, au micro ou à la localisation.</div>
+            </div>
+            <div class='controle etat-bon'>
+              <div class='controle-tete'>
+                <span class='controle-nom'>Mise à jour du navigateur</span>
+                <span class='etat'>Bon</span>
+              </div>
+              <div class='controle-detail'>Version 148.0.3967.83, mise à jour il y a 5 jour(s).</div>
+            </div>
+          </section>
+        </div>
 
+        <footer>
+            <p>Rapport généré le 26/05/2026 à 15:04</p>
+            <p>browsercheck-compagnon &mdash; par Yeni DOUKAKAS</p>
+        </footer>
+    </div>
 </body>
 </html>

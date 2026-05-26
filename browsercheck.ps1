@@ -1,6 +1,9 @@
 ﻿# browsercheck-compagnon
 # Phase 1 - Briques 1 a 3 : detection, lecture de configuration, controles
 
+# On indique a la console d'afficher correctement les accents.
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 $baseLocale = $env:LOCALAPPDATA
 
 $navigateurs = @(
@@ -30,21 +33,21 @@ function Test-SafeBrowsing {
 
     if ($config.safebrowsing.enhanced -eq $true) {
         return @{
-            Controle = "Navigation securisee (Safe Browsing)"
+            Controle = "Navigation sécurisée (Safe Browsing)"
             Etat     = "Bon"
-            Detail   = "Protection renforcee activee."
+            Detail   = "Protection renforcée activée."
         }
     }
     elseif ($config.safebrowsing.enabled -eq $false) {
         return @{
-            Controle = "Navigation securisee (Safe Browsing)"
-            Etat     = "A risque"
-            Detail   = "La protection est desactivee."
+            Controle = "Navigation sécurisée (Safe Browsing)"
+            Etat     = "À risque"
+            Detail   = "La protection est désactivée."
         }
     }
     else {
         return @{
-            Controle = "Navigation securisee (Safe Browsing)"
+            Controle = "Navigation sécurisée (Safe Browsing)"
             Etat     = "Bon"
             Detail   = "Protection standard active."
         }
@@ -64,8 +67,8 @@ function Test-PasswordManager {
     else {
         return @{
             Controle = "Gestionnaire de mots de passe du navigateur"
-            Etat     = "A ameliorer"
-            Detail   = "Le navigateur peut enregistrer les mots de passe ; un gestionnaire dedie est plus sur."
+            Etat     = "À améliorer"
+            Detail   = "Le navigateur peut enregistrer les mots de passe ; un gestionnaire dédié est plus sûr."
         }
     }
 }
@@ -75,16 +78,16 @@ function Test-HttpsOnly {
 
     if ($config.https_only_mode_enabled -eq $true) {
         return @{
-            Controle = "Connexions securisees (mode HTTPS)"
+            Controle = "Connexions sécurisées (mode HTTPS)"
             Etat     = "Bon"
-            Detail   = "Le mode HTTPS strict est active."
+            Detail   = "Le mode HTTPS strict est activé."
         }
     }
     else {
         return @{
-            Controle = "Connexions securisees (mode HTTPS)"
-            Etat     = "A ameliorer"
-            Detail   = "Le mode HTTPS strict n'est pas active."
+            Controle = "Connexions sécurisées (mode HTTPS)"
+            Etat     = "À améliorer"
+            Detail   = "Le mode HTTPS strict n'est pas activé."
         }
     }
 }
@@ -94,16 +97,16 @@ function Test-SearchEngine {
 
     if ($null -ne $config.default_search_provider_data) {
         return @{
-            Controle = "Moteur de recherche par defaut"
-            Etat     = "A ameliorer"
-            Detail   = "Le moteur a ete defini par une extension ou une strategie - a verifier."
+            Controle = "Moteur de recherche par défaut"
+            Etat     = "À améliorer"
+            Detail   = "Le moteur a été défini par une extension ou une stratégie - à vérifier."
         }
     }
     else {
         return @{
-            Controle = "Moteur de recherche par defaut"
+            Controle = "Moteur de recherche par défaut"
             Etat     = "Bon"
-            Detail   = "Moteur de recherche d'origine, non modifie."
+            Detail   = "Moteur de recherche d'origine, non modifié."
         }
     }
 }
@@ -118,16 +121,16 @@ function Test-Extensions {
 
     if ($nombre -eq 0) {
         return @{
-            Controle = "Extensions installees"
+            Controle = "Extensions installées"
             Etat     = "Bon"
-            Detail   = "Aucune extension installee : surface d'attaque nulle."
+            Detail   = "Aucune extension installée : surface d'attaque nulle."
         }
     }
     else {
         return @{
-            Controle = "Extensions installees"
-            Etat     = "A ameliorer"
-            Detail   = "$nombre extension(s) installee(s) - a passer en revue."
+            Controle = "Extensions installées"
+            Etat     = "À améliorer"
+            Detail   = "$nombre extension(s) installée(s) - à passer en revue."
         }
     }
 }
@@ -147,16 +150,16 @@ function Test-SitePermissions {
 
     if ($total -eq 0) {
         return @{
-            Controle = "Permissions sensibles accordees aux sites"
+            Controle = "Permissions sensibles accordées aux sites"
             Etat     = "Bon"
-            Detail   = "Aucun site n'a acces a la camera, au micro ou a la localisation."
+            Detail   = "Aucun site n'a accès à la caméra, au micro ou à la localisation."
         }
     }
     else {
         return @{
-            Controle = "Permissions sensibles accordees aux sites"
-            Etat     = "A ameliorer"
-            Detail   = "$total autorisation(s) sensible(s) accordee(s) - a passer en revue."
+            Controle = "Permissions sensibles accordées aux sites"
+            Etat     = "À améliorer"
+            Detail   = "$total autorisation(s) sensible(s) accordée(s) - à passer en revue."
         }
     }
 }
@@ -175,9 +178,9 @@ function Test-BrowserVersion {
 
     if ($null -eq $exe) {
         return @{
-            Controle = "Mise a jour du navigateur"
-            Etat     = "A ameliorer"
-            Detail   = "Version non determinee : executable introuvable."
+            Controle = "Mise à jour du navigateur"
+            Etat     = "À améliorer"
+            Detail   = "Version non déterminée : exécutable introuvable."
         }
     }
 
@@ -188,16 +191,16 @@ function Test-BrowserVersion {
 
     if ($jours -le 45) {
         return @{
-            Controle = "Mise a jour du navigateur"
+            Controle = "Mise à jour du navigateur"
             Etat     = "Bon"
-            Detail   = "Version $version, mise a jour il y a $jours jour(s)."
+            Detail   = "Version $version, mise à jour il y a $jours jour(s)."
         }
     }
     else {
         return @{
-            Controle = "Mise a jour du navigateur"
-            Etat     = "A ameliorer"
-            Detail   = "Version $version, pas de mise a jour depuis $jours jours - verifier la mise a jour automatique."
+            Controle = "Mise à jour du navigateur"
+            Etat     = "À améliorer"
+            Detail   = "Version $version, pas de mise à jour depuis $jours jours - vérifier la mise à jour automatique."
         }
     }
 }
@@ -209,8 +212,8 @@ function Get-Score {
     foreach ($r in $resultats) {
         switch ($r.Etat) {
             "Bon"         { $points += 2 }
-            "A ameliorer" { $points += 1 }
-            "A risque"    { $points += 0 }
+            "À améliorer" { $points += 1 }
+            "À risque"    { $points += 0 }
         }
     }
 
@@ -227,7 +230,7 @@ $rapportNavigateurs = @()
 foreach ($nav in $navigateurs) {
 
     if (Test-Path $nav.Profil) {
-        Write-Host "[OK] $($nav.Nom) est installe."
+        Write-Host "[OK] $($nav.Nom) est installé."
 
         $cheminConfig = Join-Path $nav.Profil "Default\Preferences"
 
@@ -264,39 +267,67 @@ foreach ($nav in $navigateurs) {
                 }
             }
             catch {
-                Write-Host "     /!\ La configuration n'a pas pu etre lue."
+                Write-Host "     /!\ La configuration n'a pas pu être lue."
             }
         }
         else {
-            Write-Host "     /!\ Aucun fichier de configuration trouve."
+            Write-Host "     /!\ Aucun fichier de configuration trouvé."
         }
     }
     else {
-        Write-Host "[--] $($nav.Nom) n'a pas ete detecte sur cette machine."
+        Write-Host "[--] $($nav.Nom) n'a pas été détecté sur cette machine."
     }
 }
 
 Write-Host ""
-Write-Host "[i] Resultats collectes pour $($rapportNavigateurs.Count) navigateur(s)."
+Write-Host "[i] Résultats collectés pour $($rapportNavigateurs.Count) navigateur(s)."
 
 # ===== GENERATION DU RAPPORT =====
 
-# On construit le corps du rapport a partir des resultats collectes.
-# Pour chaque navigateur : un titre (nom + score), puis une carte par controle.
-$corps = ""
+# Date et heure de generation, pour le pied de page.
+$dateRapport = Get-Date -Format "dd/MM/yyyy 'à' HH:mm"
+
+# On construit le corps du rapport : un panneau par navigateur,
+# disposes en tableau de bord.
+$corps = "        <div class='grille'>`n"
 
 foreach ($navResultat in $rapportNavigateurs) {
 
-    $corps += "    <h2>$($navResultat.Nom) - $($navResultat.Score) %</h2>`n"
+    # Couleur de la jauge selon le niveau du score.
+    if     ($navResultat.Score -ge 80) { $classeScore = "score-bon" }
+    elseif ($navResultat.Score -ge 50) { $classeScore = "score-moyen" }
+    else                               { $classeScore = "score-faible" }
+
+    $corps += "          <section class='panneau'>`n"
+    $corps += "            <h2>$($navResultat.Nom)</h2>`n"
+    $corps += "            <div class='score-ligne'>`n"
+    $corps += "              <div class='jauge'><div class='jauge-remplissage $classeScore' style='width: $($navResultat.Score)%'></div></div>`n"
+    $corps += "              <span class='score-valeur $($classeScore)-texte'>$($navResultat.Score) %</span>`n"
+    $corps += "            </div>`n"
 
     foreach ($r in $navResultat.Resultats) {
-        $corps += "    <div class='carte'>`n"
-        $corps += "      <h3>$($r.Controle)</h3>`n"
-        $corps += "      <p class='etat'>$($r.Etat)</p>`n"
-        $corps += "      <p>$($r.Detail)</p>`n"
-        $corps += "    </div>`n"
+
+        # On choisit une classe de couleur selon l'etat du controle.
+        switch ($r.Etat) {
+            "Bon"         { $classeEtat = "etat-bon" }
+            "À améliorer" { $classeEtat = "etat-ameliorer" }
+            "À risque"    { $classeEtat = "etat-risque" }
+            default       { $classeEtat = "" }
+        }
+
+        $corps += "            <div class='controle $classeEtat'>`n"
+        $corps += "              <div class='controle-tete'>`n"
+        $corps += "                <span class='controle-nom'>$($r.Controle)</span>`n"
+        $corps += "                <span class='etat'>$($r.Etat)</span>`n"
+        $corps += "              </div>`n"
+        $corps += "              <div class='controle-detail'>$($r.Detail)</div>`n"
+        $corps += "            </div>`n"
     }
+
+    $corps += "          </section>`n"
 }
+
+$corps += "        </div>`n"
 
 $html = @"
 <!DOCTYPE html>
@@ -304,10 +335,23 @@ $html = @"
 <head>
     <meta charset="UTF-8">
     <title>browsercheck-compagnon</title>
+    <link rel="stylesheet" href="rapport.css">
 </head>
 <body>
-    <h1>browsercheck-compagnon</h1>
+    <div class="page">
+        <header>
+            <div class="mascotte" role="img" aria-label="Mascotte browsercheck-compagnon"></div>
+            <div class="header-texte">
+                <h1>browsercheck-compagnon</h1>
+                <p>Diagnostic de sécurité de vos navigateurs</p>
+            </div>
+        </header>
 $corps
+        <footer>
+            <p>Rapport généré le $dateRapport</p>
+            <p>browsercheck-compagnon &mdash; par Yeni DOUKAKAS</p>
+        </footer>
+    </div>
 </body>
 </html>
 "@

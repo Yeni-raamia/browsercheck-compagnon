@@ -202,6 +202,22 @@ function Test-BrowserVersion {
     }
 }
 
+function Get-Score {
+    param($resultats)
+
+    $points = 0
+    foreach ($r in $resultats) {
+        switch ($r.Etat) {
+            "Bon"         { $points += 2 }
+            "A ameliorer" { $points += 1 }
+            "A risque"    { $points += 0 }
+        }
+    }
+
+    $maximum = $resultats.Count * 2
+    return [math]::Round(($points / $maximum) * 100)
+}
+
 # ===== PROGRAMME PRINCIPAL =====
 
 foreach ($nav in $navigateurs) {
@@ -225,10 +241,15 @@ foreach ($nav in $navigateurs) {
                 $resultats += Test-SitePermissions -config $config
                 $resultats += Test-BrowserVersion  -cheminsExe $nav.CheminsExe
 
-                # Affichage provisoire.
+               # Affichage des controles.
                 foreach ($r in $resultats) {
                     Write-Host "     [$($r.Etat)] $($r.Controle) : $($r.Detail)"
                 }
+
+                # Calcul et affichage du score.
+                $score = Get-Score -resultats $resultats
+                Write-Host ""
+                Write-Host "     >>> Niveau de protection : $score %"
             }
             catch {
                 Write-Host "     /!\ La configuration n'a pas pu etre lue."

@@ -1,4 +1,4 @@
-# browsercheck-compagnon
+﻿# browsercheck-compagnon
 # Phase 1 - Briques 1 a 3 : detection, lecture de configuration, controles
 
 $baseLocale = $env:LOCALAPPDATA
@@ -220,6 +220,10 @@ function Get-Score {
 
 # ===== PROGRAMME PRINCIPAL =====
 
+# On prepare une liste vide : elle recevra les resultats de chaque
+# navigateur, pour construire le rapport HTML apres la boucle.
+$rapportNavigateurs = @()
+
 foreach ($nav in $navigateurs) {
 
     if (Test-Path $nav.Profil) {
@@ -241,7 +245,7 @@ foreach ($nav in $navigateurs) {
                 $resultats += Test-SitePermissions -config $config
                 $resultats += Test-BrowserVersion  -cheminsExe $nav.CheminsExe
 
-               # Affichage des controles.
+                # Affichage des controles.
                 foreach ($r in $resultats) {
                     Write-Host "     [$($r.Etat)] $($r.Controle) : $($r.Detail)"
                 }
@@ -250,6 +254,14 @@ foreach ($nav in $navigateurs) {
                 $score = Get-Score -resultats $resultats
                 Write-Host ""
                 Write-Host "     >>> Niveau de protection : $score %"
+
+                # On range les resultats de ce navigateur dans la liste,
+                # pour le rapport HTML.
+                $rapportNavigateurs += @{
+                    Nom       = $nav.Nom
+                    Score     = $score
+                    Resultats = $resultats
+                }
             }
             catch {
                 Write-Host "     /!\ La configuration n'a pas pu etre lue."
@@ -263,3 +275,43 @@ foreach ($nav in $navigateurs) {
         Write-Host "[--] $($nav.Nom) n'a pas ete detecte sur cette machine."
     }
 }
+
+Write-Host ""
+Write-Host "[i] Resultats collectes pour $($rapportNavigateurs.Count) navigateur(s)."
+
+# ===== GENERATION DU RAPPORT =====
+
+# On construit le corps du rapport a partir des resultats collectes.
+# Pour chaque navigateur : un titre (nom + score), puis une carte par controle.
+$corps = ""
+
+foreach ($navResultat in $rapportNavigateurs) {
+
+    $corps += "    <h2>$($navResultat.Nom) - $($navResultat.Score) %</h2>`n"
+
+    foreach ($r in $navResultat.Resultats) {
+        $corps += "    <div class='carte'>`n"
+        $corps += "      <h3>$($r.Controle)</h3>`n"
+        $corps += "      <p class='etat'>$($r.Etat)</p>`n"
+        $corps += "      <p>$($r.Detail)</p>`n"
+        $corps += "    </div>`n"
+    }
+}
+
+$html = @"
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>browsercheck-compagnon</title>
+</head>
+<body>
+    <h1>browsercheck-compagnon</h1>
+$corps
+</body>
+</html>
+"@
+
+$cheminRapport = Join-Path $PSScriptRoot "rapport.html"
+Set-Content -Path $cheminRapport -Value $html -Encoding UTF8
+Invoke-Item $cheminRapport

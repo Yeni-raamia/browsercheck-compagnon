@@ -11,10 +11,8 @@ body {
     margin: 0;
     padding: 32px 20px;
 }
-.page {
-    max-width: 1160px;
-    margin: 0 auto;
-}
+.page { max-width: 1160px; margin: 0 auto; }
+
 header {
     display: flex;
     align-items: center;
@@ -41,12 +39,9 @@ header h1 {
     font-size: 30px;
     margin: 0;
 }
-header p {
-    margin: 6px 0 0;
-    color: #E4EFE7;
-}
+header p { margin: 6px 0 0; color: #E4EFE7; }
 
-/* ----- Tableau de bord : une grille de panneaux ----- */
+/* ----- Tableau de bord : grille de panneaux ----- */
 .grille {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -85,9 +80,7 @@ header p {
     border-radius: 999px;
     animation: remplir 1.2s ease-out;
 }
-@keyframes remplir {
-    from { width: 0; }
-}
+@keyframes remplir { from { width: 0; } }
 .score-valeur {
     font-family: 'Baloo 2', sans-serif;
     font-weight: 700;
@@ -102,7 +95,7 @@ header p {
 .score-moyen-texte  { color: #E0A23C; }
 .score-faible-texte { color: #C15A43; }
 
-/* ----- Controles compacts ----- */
+/* ----- Controle compact (etat conforme) ----- */
 .controle {
     background-color: #F3F4EF;
     border-left: 4px solid #E4EFE7;
@@ -133,6 +126,42 @@ header p {
     border-radius: 999px;
     white-space: nowrap;
 }
+
+/* ----- Controle detaille (a corriger) ----- */
+.controle-alerte {
+    background-color: #FFFFFF;
+    border-top: 1px solid #E4EFE7;
+    border-right: 1px solid #E4EFE7;
+    border-bottom: 1px solid #E4EFE7;
+    border-left-width: 5px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+}
+.controle-items {
+    margin: 8px 0 4px;
+    padding-left: 20px;
+}
+.controle-items li {
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+.etiquette {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 12px 0 3px;
+}
+.etiquette-risque  { color: #C15A43; }
+.etiquette-conseil { color: #1E5C3A; }
+.bloc-texte {
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+    color: #1C2A22;
+}
+
+/* ----- Couleurs par etat ----- */
 .etat-bon             { border-left-color: #1E5C3A; }
 .etat-bon .etat       { background-color: #1E5C3A; color: #FFFFFF; }
 .etat-ameliorer       { border-left-color: #E0A23C; }

@@ -27,6 +27,9 @@ $navigateurs = @(
 )
 
 # ===== LES CONTROLES =====
+# Chaque controle renvoie : Controle, Etat, Detail (le constat),
+# Risque (ce que l'utilisateur risque), Conseil (quoi faire),
+# Items (la liste des elements concernes, quand il y en a une).
 
 function Test-SafeBrowsing {
     param($config)
@@ -36,6 +39,9 @@ function Test-SafeBrowsing {
             Controle = "Navigation sécurisée (Safe Browsing)"
             Etat     = "Bon"
             Detail   = "Protection renforcée activée."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
     elseif ($config.safebrowsing.enabled -eq $false) {
@@ -43,6 +49,9 @@ function Test-SafeBrowsing {
             Controle = "Navigation sécurisée (Safe Browsing)"
             Etat     = "À risque"
             Detail   = "La protection est désactivée."
+            Risque   = "Le navigateur ne vous avertit plus avant les sites de hameçonnage ni les téléchargements malveillants connus."
+            Conseil  = "Réactivez la protection dans Paramètres > Confidentialité et sécurité > Sécurité."
+            Items    = @()
         }
     }
     else {
@@ -50,6 +59,9 @@ function Test-SafeBrowsing {
             Controle = "Navigation sécurisée (Safe Browsing)"
             Etat     = "Bon"
             Detail   = "Protection standard active."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
 }
@@ -62,13 +74,19 @@ function Test-PasswordManager {
             Controle = "Gestionnaire de mots de passe du navigateur"
             Etat     = "Bon"
             Detail   = "Le navigateur n'enregistre pas les mots de passe."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
     else {
         return @{
             Controle = "Gestionnaire de mots de passe du navigateur"
             Etat     = "À améliorer"
-            Detail   = "Le navigateur peut enregistrer les mots de passe ; un gestionnaire dédié est plus sûr."
+            Detail   = "Le navigateur est autorisé à enregistrer les mots de passe."
+            Risque   = "Les mots de passe stockés dans le navigateur sont accessibles à toute personne qui ouvre votre session Windows."
+            Conseil  = "Utilisez un gestionnaire dédié (Bitwarden, KeePass) et désactivez l'enregistrement dans le navigateur."
+            Items    = @()
         }
     }
 }
@@ -81,6 +99,9 @@ function Test-HttpsOnly {
             Controle = "Connexions sécurisées (mode HTTPS)"
             Etat     = "Bon"
             Detail   = "Le mode HTTPS strict est activé."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
     else {
@@ -88,6 +109,9 @@ function Test-HttpsOnly {
             Controle = "Connexions sécurisées (mode HTTPS)"
             Etat     = "À améliorer"
             Detail   = "Le mode HTTPS strict n'est pas activé."
+            Risque   = "Le navigateur peut charger des pages en HTTP non chiffré, où vos données circulent en clair et peuvent être interceptées sur le réseau."
+            Conseil  = "Activez « Toujours utiliser des connexions sécurisées » dans les paramètres de confidentialité."
+            Items    = @()
         }
     }
 }
@@ -99,7 +123,10 @@ function Test-SearchEngine {
         return @{
             Controle = "Moteur de recherche par défaut"
             Etat     = "À améliorer"
-            Detail   = "Le moteur a été défini par une extension ou une stratégie - à vérifier."
+            Detail   = "Le moteur de recherche a été défini par une extension ou une stratégie."
+            Risque   = "Un moteur imposé peut rediriger vos recherches, y insérer de la publicité ou enregistrer tout ce que vous cherchez."
+            Conseil  = "Vérifiez le moteur par défaut et l'extension qui l'a modifié, puis rétablissez un moteur de confiance."
+            Items    = @()
         }
     }
     else {
@@ -107,6 +134,9 @@ function Test-SearchEngine {
             Controle = "Moteur de recherche par défaut"
             Etat     = "Bon"
             Detail   = "Moteur de recherche d'origine, non modifié."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
 }
@@ -114,23 +144,38 @@ function Test-SearchEngine {
 function Test-Extensions {
     param($config)
 
-    $nombre = 0
+    # On releve les extensions et, si possible, leur nom lisible.
+    $noms = @()
     if ($null -ne $config.extensions.settings) {
-        $nombre = ($config.extensions.settings.PSObject.Properties.Name).Count
+        foreach ($id in $config.extensions.settings.PSObject.Properties.Name) {
+            $ext = $config.extensions.settings.$id
+            if ($null -ne $ext.manifest.name) {
+                $noms += $ext.manifest.name
+            }
+            else {
+                $noms += $id
+            }
+        }
     }
 
-    if ($nombre -eq 0) {
+    if ($noms.Count -eq 0) {
         return @{
             Controle = "Extensions installées"
             Etat     = "Bon"
             Detail   = "Aucune extension installée : surface d'attaque nulle."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
     else {
         return @{
             Controle = "Extensions installées"
             Etat     = "À améliorer"
-            Detail   = "$nombre extension(s) installée(s) - à passer en revue."
+            Detail   = "$($noms.Count) extension(s) présente(s) sur ce navigateur."
+            Risque   = "Chaque extension peut lire et modifier les pages que vous consultez ; une seule extension compromise suffit à exposer votre navigation."
+            Conseil  = "Passez en revue la liste ci-dessous et supprimez les extensions que vous n'utilisez pas ou ne reconnaissez pas."
+            Items    = $noms
         }
     }
 }
@@ -139,28 +184,54 @@ function Test-SitePermissions {
     param($config)
 
     $exceptions = $config.profile.content_settings.exceptions
-    $categories = @("geolocation", "media_stream_camera", "media_stream_mic")
 
-    $total = 0
-    foreach ($cat in $categories) {
-        if ($null -ne $exceptions.$cat) {
-            $total += ($exceptions.$cat.PSObject.Properties.Name).Count
+    # Categorie technique -> libelle lisible.
+    $categories = @{
+        geolocation         = "localisation"
+        media_stream_camera = "caméra"
+        media_stream_mic    = "micro"
+    }
+
+    # On regroupe par site : chaque site -> la liste de ses permissions.
+    $parSite = @{}
+    foreach ($cle in $categories.Keys) {
+        if ($null -ne $exceptions.$cle) {
+            foreach ($motif in $exceptions.$cle.PSObject.Properties.Name) {
+                # Le motif ressemble a "https://exemple.com:443,*" : on isole le site.
+                $site = $motif.Split(',')[0] -replace '^https?://', '' -replace ':\d+$', ''
+                if (-not $parSite.ContainsKey($site)) {
+                    $parSite[$site] = @()
+                }
+                $parSite[$site] += $categories[$cle]
+            }
         }
     }
 
-    if ($total -eq 0) {
+    if ($parSite.Count -eq 0) {
         return @{
             Controle = "Permissions sensibles accordées aux sites"
             Etat     = "Bon"
             Detail   = "Aucun site n'a accès à la caméra, au micro ou à la localisation."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
-    else {
-        return @{
-            Controle = "Permissions sensibles accordées aux sites"
-            Etat     = "À améliorer"
-            Detail   = "$total autorisation(s) sensible(s) accordée(s) - à passer en revue."
-        }
+
+    # Mise en forme : "exemple.com (caméra, micro)"
+    $liste = @()
+    foreach ($site in $parSite.Keys) {
+        $perms = ($parSite[$site] | Select-Object -Unique) -join ", "
+        $liste += "$site ($perms)"
+    }
+
+    return @{
+        Controle = "Permissions sensibles accordées aux sites"
+        Etat     = "À améliorer"
+        Detail   = "$($parSite.Count) site(s) ont accès à des fonctions sensibles de votre appareil."
+        Risque   = "Un site auquel vous avez accordé la caméra, le micro ou la localisation conserve cet accès. S'il est compromis, il peut s'en servir à votre insu."
+        Conseil  = "Ouvrez Paramètres > Confidentialité et sécurité > Paramètres des sites, et retirez les accès devenus inutiles."
+        Items    = $liste
     }
 }
 
@@ -181,6 +252,9 @@ function Test-BrowserVersion {
             Controle = "Mise à jour du navigateur"
             Etat     = "À améliorer"
             Detail   = "Version non déterminée : exécutable introuvable."
+            Risque   = "Sans pouvoir vérifier la version, impossible de garantir que le navigateur reçoit les correctifs de sécurité."
+            Conseil  = "Vérifiez manuellement la version du navigateur et lancez une recherche de mises à jour."
+            Items    = @()
         }
     }
 
@@ -194,13 +268,19 @@ function Test-BrowserVersion {
             Controle = "Mise à jour du navigateur"
             Etat     = "Bon"
             Detail   = "Version $version, mise à jour il y a $jours jour(s)."
+            Risque   = ""
+            Conseil  = ""
+            Items    = @()
         }
     }
     else {
         return @{
             Controle = "Mise à jour du navigateur"
             Etat     = "À améliorer"
-            Detail   = "Version $version, pas de mise à jour depuis $jours jours - vérifier la mise à jour automatique."
+            Detail   = "Version $version, dernière mise à jour il y a $jours jours."
+            Risque   = "Un navigateur qui n'est pas à jour conserve des failles déjà connues et activement exploitées."
+            Conseil  = "Lancez une recherche de mises à jour, redémarrez le navigateur et activez la mise à jour automatique."
+            Items    = @()
         }
     }
 }
@@ -287,8 +367,10 @@ Write-Host "[i] Résultats collectés pour $($rapportNavigateurs.Count) navigate
 # Date et heure de generation, pour le pied de page.
 $dateRapport = Get-Date -Format "dd/MM/yyyy 'à' HH:mm"
 
-# On construit le corps du rapport : un panneau par navigateur,
-# disposes en tableau de bord.
+# Ordre d'affichage des controles : les problemes d'abord.
+$ordreEtat = @{ "À risque" = 0; "À améliorer" = 1; "Bon" = 2 }
+
+# On construit le corps du rapport : un panneau par navigateur.
 $corps = "        <div class='grille'>`n"
 
 foreach ($navResultat in $rapportNavigateurs) {
@@ -305,9 +387,11 @@ foreach ($navResultat in $rapportNavigateurs) {
     $corps += "              <span class='score-valeur $($classeScore)-texte'>$($navResultat.Score) %</span>`n"
     $corps += "            </div>`n"
 
-    foreach ($r in $navResultat.Resultats) {
+    # On classe les controles : ceux a corriger en premier.
+    $controlesTries = $navResultat.Resultats | Sort-Object { $ordreEtat[$_.Etat] }
 
-        # On choisit une classe de couleur selon l'etat du controle.
+    foreach ($r in $controlesTries) {
+
         switch ($r.Etat) {
             "Bon"         { $classeEtat = "etat-bon" }
             "À améliorer" { $classeEtat = "etat-ameliorer" }
@@ -315,13 +399,41 @@ foreach ($navResultat in $rapportNavigateurs) {
             default       { $classeEtat = "" }
         }
 
-        $corps += "            <div class='controle $classeEtat'>`n"
-        $corps += "              <div class='controle-tete'>`n"
-        $corps += "                <span class='controle-nom'>$($r.Controle)</span>`n"
-        $corps += "                <span class='etat'>$($r.Etat)</span>`n"
-        $corps += "              </div>`n"
-        $corps += "              <div class='controle-detail'>$($r.Detail)</div>`n"
-        $corps += "            </div>`n"
+        if ($r.Etat -eq "Bon") {
+
+            # Controle conforme : ligne compacte.
+            $corps += "            <div class='controle $classeEtat'>`n"
+            $corps += "              <div class='controle-tete'>`n"
+            $corps += "                <span class='controle-nom'>$($r.Controle)</span>`n"
+            $corps += "                <span class='etat'>$($r.Etat)</span>`n"
+            $corps += "              </div>`n"
+            $corps += "              <div class='controle-detail'>$($r.Detail)</div>`n"
+            $corps += "            </div>`n"
+        }
+        else {
+
+            # Controle a corriger : carte detaillee.
+            $corps += "            <div class='controle controle-alerte $classeEtat'>`n"
+            $corps += "              <div class='controle-tete'>`n"
+            $corps += "                <span class='controle-nom'>$($r.Controle)</span>`n"
+            $corps += "                <span class='etat'>$($r.Etat)</span>`n"
+            $corps += "              </div>`n"
+            $corps += "              <div class='controle-detail'>$($r.Detail)</div>`n"
+
+            if ($r.Items.Count -gt 0) {
+                $corps += "              <ul class='controle-items'>`n"
+                foreach ($item in $r.Items) {
+                    $corps += "                <li>$item</li>`n"
+                }
+                $corps += "              </ul>`n"
+            }
+
+            $corps += "              <p class='etiquette etiquette-risque'>Ce que vous risquez</p>`n"
+            $corps += "              <p class='bloc-texte'>$($r.Risque)</p>`n"
+            $corps += "              <p class='etiquette etiquette-conseil'>À faire</p>`n"
+            $corps += "              <p class='bloc-texte'>$($r.Conseil)</p>`n"
+            $corps += "            </div>`n"
+        }
     }
 
     $corps += "          </section>`n"

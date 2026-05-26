@@ -5,12 +5,21 @@ $baseLocale = $env:LOCALAPPDATA
 
 $navigateurs = @(
     @{
-        Nom    = "Google Chrome"
-        Profil = Join-Path $baseLocale "Google\Chrome\User Data"
+        Nom        = "Google Chrome"
+        Profil     = Join-Path $baseLocale "Google\Chrome\User Data"
+        CheminsExe = @(
+            "C:\Program Files\Google\Chrome\Application\chrome.exe"
+            "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+            (Join-Path $baseLocale "Google\Chrome\Application\chrome.exe")
+        )
     },
     @{
-        Nom    = "Microsoft Edge"
-        Profil = Join-Path $baseLocale "Microsoft\Edge\User Data"
+        Nom        = "Microsoft Edge"
+        Profil     = Join-Path $baseLocale "Microsoft\Edge\User Data"
+        CheminsExe = @(
+            "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+            "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
+        )
     }
 )
 
@@ -152,6 +161,47 @@ function Test-SitePermissions {
     }
 }
 
+function Test-BrowserVersion {
+    param($cheminsExe)
+
+    # On cherche le premier chemin d'executable qui existe reellement.
+    $exe = $null
+    foreach ($chemin in $cheminsExe) {
+        if (Test-Path $chemin) {
+            $exe = $chemin
+            break
+        }
+    }
+
+    if ($null -eq $exe) {
+        return @{
+            Controle = "Mise a jour du navigateur"
+            Etat     = "A ameliorer"
+            Detail   = "Version non determinee : executable introuvable."
+        }
+    }
+
+    # On lit les informations du fichier executable.
+    $infos   = Get-Item -Path $exe
+    $version = $infos.VersionInfo.ProductVersion
+    $jours   = (New-TimeSpan -Start $infos.LastWriteTime -End (Get-Date)).Days
+
+    if ($jours -le 45) {
+        return @{
+            Controle = "Mise a jour du navigateur"
+            Etat     = "Bon"
+            Detail   = "Version $version, mise a jour il y a $jours jour(s)."
+        }
+    }
+    else {
+        return @{
+            Controle = "Mise a jour du navigateur"
+            Etat     = "A ameliorer"
+            Detail   = "Version $version, pas de mise a jour depuis $jours jours - verifier la mise a jour automatique."
+        }
+    }
+}
+
 # ===== PROGRAMME PRINCIPAL =====
 
 foreach ($nav in $navigateurs) {
@@ -173,6 +223,7 @@ foreach ($nav in $navigateurs) {
                 $resultats += Test-SearchEngine    -config $config
                 $resultats += Test-Extensions      -config $config
                 $resultats += Test-SitePermissions -config $config
+                $resultats += Test-BrowserVersion  -cheminsExe $nav.CheminsExe
 
                 # Affichage provisoire.
                 foreach ($r in $resultats) {

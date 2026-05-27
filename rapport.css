@@ -175,3 +175,106 @@ footer {
     font-size: 13px;
     color: #1C2A22;
 }
+/* ===== AJOUTS PHASE 2 ===== */
+
+/* Banniere d'instruction en haut du rapport */
+.banniere {
+    padding: 1.2em 1.5em;
+    border-radius: 8px;
+    margin: 1.5em 0;
+    border-left: 4px solid;
+    font-size: 0.95em;
+    line-height: 1.55;
+}
+.banniere p { margin: 0; }
+.banniere-diagnostic {
+    background: #FEF3C7;
+    border-color: #F2A93B;
+    color: #92400E;
+}
+.banniere-final {
+    background: #D1FAE5;
+    border-color: #10B981;
+    color: #065F46;
+}
+
+/* Etat "Corrige" : visuellement distinct du "Bon" */
+.controle.etat-corrige {
+    border-left: 4px solid #10B981;
+    background: #ECFDF5;
+}
+.controle.etat-corrige .etat {
+    background: #10B981;
+    color: white;
+    font-weight: 600;
+}
+.controle.etat-corrige .controle-detail {
+    color: #065F46;
+}
+
+/* Accordeons interactifs - boutons sobres et raffines */
+.accordeon { margin-top: 0.8em; }
+
+.accordeon summary {
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0.5em 0.95em;
+    margin-top: 0.7em;
+    border-radius: 8px;
+    border: 1px solid #E5E7EB;
+    background: #FFFFFF;
+    color: #374151;
+    font-size: 0.9em;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    transition: all 0.15s ease;
+}
+
+.accordeon summary::-webkit-details-marker { display: none; }
+
+/* Pastille de couleur a gauche : seul accent chromatique */
+.accordeon summary::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Chevron net a droite, qui pivote a l'ouverture */
+.accordeon summary::after {
+    content: '›';
+    font-size: 1.25em;
+    line-height: 1;
+    color: #9CA3AF;
+    transition: transform 0.2s ease;
+}
+
+.accordeon[open] summary::after {
+    transform: rotate(90deg);
+}
+
+.accordeon summary:hover {
+    background: #F9FAFB;
+    border-color: #D1D5DB;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+/* Pastille rouge pour "Ce que vous risquez" */
+.accordeon summary.etiquette-risque::before {
+    background: #DC2626;
+}
+
+/* Pastille verte pour "A faire" */
+.accordeon summary.etiquette-conseil::before {
+    background: #059669;
+}
+
+.accordeon p.bloc-texte { margin-top: 0.7em; color: #4B5563; }

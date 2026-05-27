@@ -1,85 +1,93 @@
 # browsercheck-compagnon
 
-> Diagnostic de sécurité des navigateurs web, pour Windows.
-> Un outil de la famille **Compagnon**.
+Outil PowerShell de diagnostic et de durcissement de la sécurité des navigateurs web sous Windows. Membre de la famille **« Outils Compagnon »**.
 
-`browsercheck-compagnon` analyse la configuration de sécurité des navigateurs installés sur un poste Windows et produit un rapport clair, visuel et actionnable — lisible aussi bien par un utilisateur que par un responsable de la sécurité.
+Lance un diagnostic en sept points sur Google Chrome et Microsoft Edge, produit un rapport HTML lisible, puis propose à l'utilisateur de corriger automatiquement les réglages signalés — un par un, avec son accord explicite à chaque étape.
 
 ![Aperçu du rapport browsercheck-compagnon](apercu-rapport.png)
 
-## À propos
-
-Cet outil fait partie des **Outils Compagnon**, une famille d'outils de cybersécurité pensés pour être simples, lisibles et utiles au quotidien.
-
-**Version actuelle : Phase 1 — diagnostic.** L'outil analyse et rend compte ; il ne modifie aucun réglage. Il fonctionne en **lecture seule**, ne demande **aucun droit administrateur**, et ne transmet **aucune donnée** sur internet : il lit uniquement des fichiers locaux.
-
 ## Ce que l'outil vérifie
 
-Pour chaque navigateur détecté — Google Chrome et Microsoft Edge — sept contrôles de sécurité :
+| Contrôle | Diagnostic | Correction (v2.0) |
+|---|---|---|
+| Navigation sécurisée (Safe Browsing / SmartScreen) | ✓ | ✓ |
+| Gestionnaire de mots de passe | ✓ | ✓ |
+| Connexions sécurisées (mode HTTPS) | ✓ | ✓ |
+| Moteur de recherche par défaut | ✓ | conseil |
+| Extensions installées | ✓ | conseil |
+| Permissions sensibles aux sites (caméra, micro, localisation) | ✓ | conseil |
+| Mise à jour du navigateur | ✓ | conseil |
 
-- **Navigation sécurisée** — la protection contre les sites de hameçonnage
-- **Gestionnaire de mots de passe** — l'enregistrement des mots de passe par le navigateur
-- **Connexions sécurisées** — l'activation du mode HTTPS strict
-- **Moteur de recherche par défaut** — sa modification éventuelle par une extension
-- **Extensions installées** — leur présence et leur nombre
-- **Permissions sensibles** — les sites ayant accès à la caméra, au micro ou à la localisation
-- **Mise à jour du navigateur** — l'ancienneté de la version installée
-
-Chaque navigateur reçoit un **score de protection**. Pour chaque point à corriger, le rapport précise le risque encouru et l'action recommandée.
-
-## Le rapport
-
-À la fin de l'analyse, l'outil génère et ouvre `rapport.html` : un tableau de bord présentant les navigateurs côte à côte, chacun avec son score, ses points conformes et ses points à corriger mis en avant. Le rapport est **autonome** — il s'ouvre sans connexion internet, polices et mascotte comprises.
-
-## Prérequis
-
-- Windows 10 ou 11
-- Windows PowerShell 5.1 (inclus dans Windows) ou PowerShell 7 et supérieur
+Les corrections automatiques sont appliquées via les stratégies de groupe Windows officielles (`HKLM:\SOFTWARE\Policies\…`) — le mécanisme prévu par Google et Microsoft, durable et documenté.
 
 ## Utilisation
 
-Récupérez le dépôt :
+### Pré-requis
 
-```
-git clone https://github.com/Yeni-raamia/browsercheck-compagnon.git
-```
+- Windows 10 ou 11
+- PowerShell 5.1 ou supérieur (préinstallé)
 
-Si l'exécution de scripts est bloquée sur votre poste, autorisez-la pour votre compte — à faire une seule fois :
+### Lancer
 
-```
-Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
-```
+Téléchargez `browsercheck.ps1` et `rapport.css` dans un même dossier, puis :
 
-Placez-vous dans le dossier de l'outil et lancez l'analyse :
-
-```
+```powershell
 .\browsercheck.ps1
 ```
 
-L'analyse dure quelques secondes, puis le rapport `rapport.html` s'ouvre automatiquement.
+L'outil détecte automatiquement s'il dispose des droits administrateur. Si ce n'est pas le cas, il se relance lui-même en version élevée — une fenêtre UAC apparaît, vous n'avez rien à faire de plus.
+
+> Si Windows bloque le script (« scripts désactivés sur ce système »), c'est la stratégie d'exécution PowerShell. Lancez à la place :
+>
+> ```powershell
+> powershell -ExecutionPolicy Bypass -File .\browsercheck.ps1
+> ```
+
+### Déroulé
+
+1. **Diagnostic** : examen des navigateurs installés, affichage dans la console.
+2. **Rapport** : un rapport HTML s'ouvre dans votre navigateur, listant les points à renforcer avec des sections déroulables « Ce que vous risquez » et « À faire ».
+3. **Décision** : de retour dans la fenêtre PowerShell, l'outil demande « Souhaitez-vous lancer la sécurisation ? (O/N) ».
+4. **Corrections** : pour chaque point corrigeable, l'outil affiche le constat et le risque, puis attend votre confirmation. Rien n'est modifié sans « O ».
+5. **Récapitulatif** : la liste des corrections appliquées, avec pour chacune la commande exacte pour l'annuler.
+6. **Rapport final** : un second rapport s'ouvre, avec les contrôles corrigés marqués « ✓ Corrigé » et le score mis à jour.
+
+Les stratégies prennent effet au prochain démarrage du navigateur. Les réglages corrigés y afficheront « géré par votre organisation » — c'est normal, c'est le signe que le durcissement tient.
+
+## Réversibilité
+
+Chaque correction est une simple écriture dans le registre Windows. Pour annuler une correction, le récapitulatif de l'outil affiche la commande à utiliser. Par exemple :
+
+```powershell
+Remove-ItemProperty -Path 'HKLM:\SOFTWARE\Policies\Google\Chrome' -Name 'HttpsOnlyMode'
+```
+
+Pour tout annuler en bloc :
+
+```powershell
+Remove-Item -Path 'HKLM:\SOFTWARE\Policies\Google\Chrome' -Force
+Remove-Item -Path 'HKLM:\SOFTWARE\Policies\Microsoft\Edge' -Force
+```
+
+## Compatibilité
+
+- **Systèmes** : Windows 10, Windows 11
+- **Navigateurs** : Google Chrome, Microsoft Edge
 
 ## Contenu du dépôt
 
-- `browsercheck.ps1` — le script d'analyse
-- `rapport.css` — la feuille de style du rapport (charte Outils Compagnon ; polices et mascotte intégrées)
+- `browsercheck.ps1` — le script
+- `rapport.css` — la feuille de style (polices Baloo 2 et Nunito + mascotte intégrées en base64, le rapport fonctionne hors ligne)
+- `LICENSE` — licence MIT
 
-Le fichier `rapport.html` est généré localement à chaque exécution.
-
-## Feuille de route
-
-- **Phase 2 — durcissement interactif** : proposer de corriger directement les réglages signalés par le diagnostic.
-
-## Crédits
-
-Les polices **Baloo 2** et **Nunito** sont incluses sous licence SIL Open Font License.
-
-## Auteur
-
-**Yeni DOUKAKAS**
-
-- LinkedIn : https://www.linkedin.com/in/yeni-doukakas-b9682a127/
-- Contact : cybercompagnon@gmail.com
+Le fichier `rapport.html` est généré localement à chaque exécution et n'est pas versionné.
 
 ## Licence
 
-Ce projet est distribué sous licence MIT — voir le fichier `LICENSE`.
+MIT — voir [LICENSE](LICENSE).
+
+## Auteur
+
+**Yeni DOUKAKAS** — cybercompagnon@gmail.com
+
+Famille **Outils Compagnon** : des outils de cybersécurité pour le grand public, en français.

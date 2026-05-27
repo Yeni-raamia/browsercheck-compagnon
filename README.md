@@ -91,3 +91,4 @@ MIT — voir [LICENSE](LICENSE).
 **Yeni DOUKAKAS** — cybercompagnon@gmail.com
 
 Famille **Outils Compagnon** : des outils de cybersécurité pour le grand public, en français.
+.
